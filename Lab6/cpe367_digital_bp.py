@@ -125,6 +125,7 @@ def process_wav(fpath_wav_in,fpath_wav_out):
 		# convert to signed int
 		yout = int(round(yout))
 		
+		
 		# output current sample
 		ostat = wav_out.write_wav(yout)
 		if ostat == False: break
@@ -133,7 +134,7 @@ def process_wav(fpath_wav_in,fpath_wav_out):
 	#  important to close output file - header is updated (with proper file size)
 	wav_in.close_wav()
 	wav_out.close_wav()
-		
+	
 	return True
 
 

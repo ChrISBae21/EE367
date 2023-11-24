@@ -45,8 +45,8 @@ def dft(fpath_wav_in):
 	###############################################################
 	###############################################################
 	
-	N = 4000 	#number of samples
-	fs = 4000 	#sampling rate	
+	N = 8000 	#number of samples
+	fs = 4000 	#sampling rate	makes copies at the sampling rate => (fo / fs) * N
 	###############################################################
 	###############################################################
 	
@@ -73,6 +73,7 @@ def dft(fpath_wav_in):
 		f[k] = fs*(k/N)									#calculates the frequency in Hz
   
 		for n in range(N):
+			if xin[n] == None: break
 			cos += xin[n] * math.cos((2*math.pi*k*n)/N)
 			sin += xin[n] * math.sin((2*math.pi*k*n)/N)
 		real = cos / N
@@ -102,25 +103,25 @@ def dft(fpath_wav_in):
 			count += 1
 		else:
 			continue
-
-	fc = num / den
+	
+	if den == 0:
+		fc = 0
+	else:
+		fc = num / den
 
 	###############################################################
 	###############################################################	
 
-	#calculate air gap in inches
-	L = (343/(2*fc)) * 39.37
 	
 
 	print('Max Magnitude: ' + str(T))
 	print('Frequency of Raw Peak (Hz): ' + str(f[npeak]))
 	print('Frequency of the peak found via weighted average: ' + str(fc))
-	print('Length of air gap: ' + str(L))
  
 	# matplotlib mimics the plotting environment of MatLab. Plots can be displayed like this
 	# given two lists of data for x and y: xpoint_list and ypoint_list
 	fig, ax = plt.subplots()
-	ax.plot(np.array(f[:1000]), np.array(xn_mag[:1000]))
+	ax.plot(np.array(f[:]), np.array(xn_mag[:]))
 	ax.set(xlabel='Frequency (Hz)', ylabel='Counts', title=fpath_wav_in + ' ')
 	ax.grid()
 	fig.savefig('image_file.png')

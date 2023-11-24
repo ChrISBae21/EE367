@@ -48,12 +48,12 @@ def process_wav(fpath_wav_in,fpath_wav_out):
 	###############################################################
 	###############################################################
 	
-	M = 21				#number of coefficients
+	M = 2				#number of coefficients 
 	bk = [0] * M
 	G = 1				#gain
 	fs = 4000 			#sampling rate (Hz)
-	fwbp = 4000			#bandpass width frequency (Hz)
-	fcbp = 4000			#bandpass center frequency (Hz)
+	fwbp = 200			#bandpass width frequency (Hz)
+	fcbp = 1633			#bandpass center frequency (Hz)
  
 	Fwbp = fwbp / fs	#digital BP frequency width (samples/cycle)
 	Fcbp = fcbp / fs	#digital BP center frequency (samples/cycle)
@@ -154,8 +154,8 @@ def main():
 		return False
 			
 	# grab file names
-	fpath_wav_in = 'in_noise.wav'
-	fpath_wav_out = 'out_noise_bp.wav'
+	fpath_wav_in = 'out.wav'
+	fpath_wav_out = 'test_bp.wav'
 	
 	
 	
