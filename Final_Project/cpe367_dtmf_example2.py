@@ -167,8 +167,20 @@ def process_wav(fpath_sig_in):
 		dft_1336 = dft(N, fs, fifo_y_1336)
 		dft_1477 = dft(N, fs, fifo_y_1477)
 		dft_1633 = dft(N, fs, fifo_y_1633)
+#-------------------------------------------------------------------------  
+			# create dictionary of answers
+		answers = {}
+		answers[697] = {1209: 1, 1336: 2, 1477: 3, 1633: 10}
+		answers[770] = {1209: 4, 1336: 5, 1477: 6, 1633: 11}
+		answers[852] = {1209: 7, 1336: 8, 1477: 9, 1633: 12}
+		answers[941] = {1209: 14, 1336: 0, 1477: 15, 1633: 13}
+		answers[1209] = {697: 1, 770: 4, 852: 7, 941: 14}
+		answers[1336] = {697: 2, 770: 5, 852: 8, 941: 0}
+		answers[1477] = {697: 3, 770: 6, 852: 9, 941: 15}
+		answers[1633] = {697: 10, 770: 11, 852: 12, 941: 13}
+#-------------------------------------------------------------------------
   
-		dft_r_list = [dft_697, dft_770, dft_852, dft_941]
+		'''dft_r_list = [dft_697, dft_770, dft_852, dft_941]
 		dft_c_list = [dft_1209, dft_1336, dft_1477, dft_1633]
 		max_r_mag = 0
 		max_c_mag = 0
@@ -204,34 +216,33 @@ def process_wav(fpath_sig_in):
 		elif (max_c_freq >= 1556 and max_c_freq <= 1733):
 			c_ans = 1633
 
-
-		# create dictionary of answers
-		answers = {}
-		answers[697] = {1209: 1, 1336: 2, 1477: 3, 1633: 10}
-		answers[770] = {1209: 4, 1336: 5, 1477: 6, 1633: 11}
-		answers[852] = {1209: 7, 1336: 8, 1477: 9, 1633: 12}
-		answers[941] = {1209: 14, 1336: 0, 1477: 15, 1633: 13}
-		answers[1209] = {697: 1, 770: 4, 852: 7, 941: 14}
-		answers[1336] = {697: 2, 770: 5, 852: 8, 941: 0}
-		answers[1477] = {697: 3, 770: 6, 852: 9, 941: 15}
-		answers[1633] = {697: 10, 770: 11, 852: 12, 941: 13}
-
 		
 		if r_ans not in answers or c_ans not in answers[r_ans]:
 			symbol_val_det = 0
 		else:
-			symbol_val_det = answers[r_ans][c_ans]
+			symbol_val_det = answers[r_ans][c_ans]'''
+   
+#-------------------------------------------------------------------------------------------------   
 
-		'''if (dft_697[1] > dft_770[1]):
+		if (dft_697[1] > dft_770[1] and dft_697[1] > dft_852[1] and dft_697[1] > dft_941[1]):
 			row = 697
-		else:
+		elif (dft_770[1] > dft_852[1] and dft_770[1] > dft_941[1]):
 			row = 770
-		if (dft_1209[1] > dft_1336[1]):
-			col = 1209
+		elif (dft_852[1] > dft_941[1]):
+			row = 852
 		else:
+			row = 941
+   
+	
+		if (dft_1209[1] > dft_1336[1] and dft_1209[1] > dft_1477[1] and dft_1209[1] > dft_1633[1]):
+			col = 1209
+		elif (dft_1336[1] > dft_852[1] and dft_1336[1] > dft_1477[1]):
 			col = 1336
-			
-		symbol_val_det = answers[row][col]'''
+		elif (dft_1477[1] > dft_1633[1]):
+			col = 1477
+		else:
+			col = 1633
+		symbol_val_det =  answers[row][col]
 
 		# save intermediate signals as needed, for plotting
 		#  add signals, as desired!
