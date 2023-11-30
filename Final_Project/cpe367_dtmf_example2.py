@@ -180,7 +180,7 @@ def process_wav(fpath_sig_in):
 		answers[1633] = {697: 10, 770: 11, 852: 12, 941: 13}
 #-------------------------------------------------------------------------
   
-		'''dft_r_list = [dft_697, dft_770, dft_852, dft_941]
+		dft_r_list = [dft_697, dft_770, dft_852, dft_941]
 		dft_c_list = [dft_1209, dft_1336, dft_1477, dft_1633]
 		max_r_mag = 0
 		max_c_mag = 0
@@ -220,11 +220,11 @@ def process_wav(fpath_sig_in):
 		if r_ans not in answers or c_ans not in answers[r_ans]:
 			symbol_val_det = 0
 		else:
-			symbol_val_det = answers[r_ans][c_ans]'''
+			symbol_val_det = answers[r_ans][c_ans]
    
 #-------------------------------------------------------------------------------------------------   
 
-		if (dft_697[1] > dft_770[1] and dft_697[1] > dft_852[1] and dft_697[1] > dft_941[1]):
+		'''if (dft_697[1] > dft_770[1] and dft_697[1] > dft_852[1] and dft_697[1] > dft_941[1]):
 			row = 697
 		elif (dft_770[1] > dft_852[1] and dft_770[1] > dft_941[1]):
 			row = 770
@@ -242,7 +242,7 @@ def process_wav(fpath_sig_in):
 			col = 1477
 		else:
 			col = 1633
-		symbol_val_det =  answers[row][col]
+		symbol_val_det =  answers[row][col]'''
 
 		# save intermediate signals as needed, for plotting
 		#  add signals, as desired!
@@ -278,7 +278,7 @@ def process_wav(fpath_sig_in):
 		
 	# define which signals should be plotted
 	#plot_sig_list = ['sig_1','sig_2','symbol_val','symbol_det','error']
-	plot_sig_list = ['sig_1','symbol_val','symbol_det', 
+	plot_sig_list = ['sig_1','error', 'symbol_val','symbol_det', 
                   	 '697','770',
                      '1209','1336']
 	'''plot_sig_list = ['sig_1','symbol_val','symbol_det', 
@@ -315,12 +315,12 @@ def dft(N, fs, y_fifo):
             real = cos / N
             imag = sin / N
             xn_mag[k] = math.sqrt((real*real) + (imag*imag))	#calculates the magnitude
-               #keep track of the maximum magnitude
+        #keep track of the maximum magnitude
         if xn_mag[k] > T and f[k] < 2000:
             T = xn_mag[k]
             npeak = k
 
-	#calculate weighted averages
+#calculate weighted averages
     num = 0
     den = 0
     fc = 0
@@ -332,7 +332,7 @@ def dft(N, fs, y_fifo):
             count += 1
         else:
             continue
-
+    
     fc = num / den
     
     return (fc, xn_mag[round((fc*N)/fs)])
