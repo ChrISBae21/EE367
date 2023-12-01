@@ -43,31 +43,31 @@ def process_wav(fpath_sig_in):
 	########################
 	# FILTER COEFFICIENTS
 	C = 1024
-	N = 16
+	N = 64
  	#ROWS---------------------------------------------------
 
 
    #FILTER 697
-	'''fifo_y_697 = my_fifo(N)
-	G_697 = 0.015773598954725479015515077207965077832
-	BK_697 = [G_697 * 1, G_697 * -1,
-				-1 * -0.907658237745450180433692821679869666696,
-				-1 * 0.968452802090549069724545461212983354926]'''
-    
 	fifo_y_697 = my_fifo(N)
+	G_697 = 0.018188366000000000949343714751194056589 
+	BK_697 = [G_697 * 1, G_697 * -1,
+				-1 * -0.89974373589061173994707587553421035409,
+				-1 *   0.963628930577864029061174733215011656284]
+    
+	'''fifo_y_697 = my_fifo(N)
 	BK_697 = [0.169290213535903760755374491964175831527 , 0,
 			-1 * -0.826083303834324933490051989792846143246,
-			-1 * 0.809999999999999942268402719491859897971]
+			-1 * 0.809999999999999942268402719491859897971]'''
  
 	fifo_y_770 = my_fifo(N)
 	BK_770 = [0.177777999999999991587174008600413799286  , 0,
 			-1 * -0.6362768971317435129364525892015080899 ,
 			-1 * 0.810000000000000386357612569554476067424 ]
  
-	fifo_y_1209 = my_fifo(N)
+	'''fifo_y_1209 = my_fifo(N)
 	BK_1209 = [0.262709077018945524883974940166808664799, 0,
 				-1 * 0.547983278990897049176567179529229179025,
-				-1 * 0.722500000000000031086244689504383131862]
+				-1 * 0.722500000000000031086244689504383131862]'''
 	fifo_y_1336 = my_fifo(N)
 	BK_1336 = [0.164146336458953157055873361969133839011, 0,
 				-1 * 0.906515709705711492105706383881624788046,
@@ -100,14 +100,14 @@ def process_wav(fpath_sig_in):
 
 
 	#FILTER 1209
-	'''fifo_y_1209 = my_fifo(N)
-	G_1209 = 0.067128844698664216772421298173867398873
+	fifo_y_1209 = my_fifo(N)
+	G_1209 = 0.018185534711067919549920546273824584205
 	BK_1209 = [G_1209 * 1, G_1209 * -1,
-				-1 * 0.591357952239581874387397419923217967153,
-				-1 * 0.865742310602671594210733019281178712845]
+				-1 * 0.633162787085058131886228238727198913693,
+				-1 * 0.963628930577864140083477195730665698647]
 
 	#FILTER 1336
-	fifo_y_1336 = my_fifo(N)
+	'''fifo_y_1336 = my_fifo(N)
 	G_1336 = 0.023002894973895255531504133728049055208
 	BK_1336 = [G_1336 * 1, G_1336 * -1,
 				-1 * 0.969199301848925776070586834975983947515,
@@ -140,12 +140,22 @@ def process_wav(fpath_sig_in):
 		BK_1477[i] = int(round(BK_1477[i] * C))
 		BK_1633[i] = int(round(BK_1633[i] * C))
 
- 
+			# create dictionary of answers
+		answers = {}
+		answers[697] = {1209: 1, 1336: 2, 1477: 3, 1633: 10}
+		answers[770] = {1209: 4, 1336: 5, 1477: 6, 1633: 11}
+		answers[852] = {1209: 7, 1336: 8, 1477: 9, 1633: 12}
+		answers[941] = {1209: 14, 1336: 0, 1477: 15, 1633: 13}
+		answers[1209] = {697: 1, 770: 4, 852: 7, 941: 14}
+		answers[1336] = {697: 2, 770: 5, 852: 8, 941: 0}
+		answers[1477] = {697: 3, 770: 6, 852: 9, 941: 15}
+		answers[1633] = {697: 10, 770: 11, 852: 12, 941: 13}
  
 	fifo_x = my_fifo(2)
 
 	# process input	
 	xin = 0
+	count = 0
 	for n_curr in range(s2.get_len()):
 	
 		# read next input sample from the signal analyzer
@@ -153,7 +163,7 @@ def process_wav(fpath_sig_in):
   
 		########################
 		#FILTER EVALUATION
-  
+		
 		y_out_770 = (xin * BK_770[0] + fifo_x.get(1) * BK_770[1]  + fifo_y_770.get(0) * BK_770[2] + fifo_y_770.get(1) * BK_770[3]) / C
 		y_out_697 = (xin * BK_697[0] + fifo_x.get(1) * BK_697[1]  + fifo_y_697.get(0) * BK_697[2] + fifo_y_697.get(1) * BK_697[3]) / C
 		y_out_852 = (xin * BK_852[0] + fifo_x.get(1) * BK_852[1]  + fifo_y_852.get(0) * BK_852[2] + fifo_y_852.get(1) * BK_852[3]) / C
@@ -179,6 +189,7 @@ def process_wav(fpath_sig_in):
 		########################
 		# students: combine results from filtering stages
 		#  and find (best guess of) symbol that is present at this sample time
+	
 		dft_697 = dft(N, fs, fifo_y_697)
 		dft_770 = dft(N, fs, fifo_y_770)
 		dft_852 = dft(N, fs, fifo_y_852)
@@ -189,16 +200,7 @@ def process_wav(fpath_sig_in):
 		dft_1477 = dft(N, fs, fifo_y_1477)
 		dft_1633 = dft(N, fs, fifo_y_1633)
 #-------------------------------------------------------------------------  
-			# create dictionary of answers
-		answers = {}
-		answers[697] = {1209: 1, 1336: 2, 1477: 3, 1633: 10}
-		answers[770] = {1209: 4, 1336: 5, 1477: 6, 1633: 11}
-		answers[852] = {1209: 7, 1336: 8, 1477: 9, 1633: 12}
-		answers[941] = {1209: 14, 1336: 0, 1477: 15, 1633: 13}
-		answers[1209] = {697: 1, 770: 4, 852: 7, 941: 14}
-		answers[1336] = {697: 2, 770: 5, 852: 8, 941: 0}
-		answers[1477] = {697: 3, 770: 6, 852: 9, 941: 15}
-		answers[1633] = {697: 10, 770: 11, 852: 12, 941: 13}
+
 #-------------------------------------------------------------------------
   
 		'''dft_r_list = [dft_697, dft_770, dft_852, dft_941]
@@ -333,9 +335,9 @@ def dft(N, fs, y_fifo):
         for n in range(N):
             cos += xin[n] * math.cos((2*math.pi*k*n)/N)
             sin += xin[n] * math.sin((2*math.pi*k*n)/N)
-            real = cos / N
-            imag = sin / N
-            xn_mag[k] = math.sqrt((real*real) + (imag*imag))	#calculates the magnitude
+        real = cos / N
+        imag = sin / N
+        xn_mag[k] = math.sqrt((real*real) + (imag*imag))	#calculates the magnitude
         #keep track of the maximum magnitude
         if xn_mag[k] > T and f[k] < 2000:
             T = xn_mag[k]
@@ -373,8 +375,8 @@ def main():
 		return False
 		
 	# assign file name
-	#fpath_sig_in = 'dtmf_signals_slow.txt'
-	fpath_sig_in = 'dtmf_signals_fast.txt'
+	fpath_sig_in = 'dtmf_signals_slow.txt'
+	#fpath_sig_in = 'dtmf_signals_fast.txt'
 	
 	
 	# let's do it!
