@@ -153,64 +153,54 @@ def process_wav(fpath_sig_in):
 		fifo_y_1633.update(y_out_1633)
 
 	
-		########################
+########################################################################################
 		
-		if((count % (N//N)) == 0): #16
-			dft_697 = dft(N, fs, fifo_y_697)
-			dft_770 = dft(N, fs, fifo_y_770)
-			dft_852 = dft(N, fs, fifo_y_852)
-			dft_941 = dft(N, fs, fifo_y_941)
+		# evaluate FFT/DFT for each filter output
+		dft_697 = dft(N, fs, fifo_y_697)
+		dft_770 = dft(N, fs, fifo_y_770)
+		dft_852 = dft(N, fs, fifo_y_852)
+		dft_941 = dft(N, fs, fifo_y_941)
 
-			dft_1209 = dft(N, fs, fifo_y_1209)
-			dft_1336 = dft(N, fs, fifo_y_1336)
-			dft_1477 = dft(N, fs, fifo_y_1477)
-			dft_1633 = dft(N, fs, fifo_y_1633)
+		dft_1209 = dft(N, fs, fifo_y_1209)
+		dft_1336 = dft(N, fs, fifo_y_1336)
+		dft_1477 = dft(N, fs, fifo_y_1477)
+		dft_1633 = dft(N, fs, fifo_y_1633)
   
-		count += 1
+	
   
-		
+# compare magnitudes from the FFT/DFT for each filter to find row and col frequencies #
+# ---------------------------------------------------------ROWS---------------------------------------------------------
 		if (dft_697[1] > dft_770[1] and dft_697[1] > dft_852[1] and dft_697[1] > dft_941[1]):
 			row = 697 
-			r_mag = dft_697[1]
 		elif (dft_770[1] > dft_852[1] and dft_770[1] > dft_941[1]):
 			row = 770 
-			r_mag = dft_770[1]
 		elif (dft_852[1] > dft_941[1]):
 			row = 852 
-			r_mag = dft_852[1]
 		else:
 			row = 941 
-			r_mag = dft_941[1]
    
-	
+# ---------------------------------------------------------COLS---------------------------------------------------------
 		if (dft_1209[1] > dft_1336[1] and dft_1209[1] > dft_1477[1] and dft_1209[1] > dft_1633[1]):
 			col = 1209
-			c_mag = dft_1209[1]
 		elif (dft_1336[1] > dft_852[1] and dft_1336[1] > dft_1477[1]):
 			col = 1336 
-			c_mag = dft_1336[1]
 		elif (dft_1477[1] > dft_1633[1]):
 			col = 1477 
-			c_mag = dft_1477[1]
 		else:
 			col = 1633 
-			c_mag = dft_1633[1]
 		symbol_val_det =  answers[row][col]
   
-		'''if count < 8 or (r_mag <= 20 and c_mag <= 20):
-			symbol_val_det = 0'''
-		
+
 
 		# save intermediate signals as needed, for plotting
-		#  add signals, as desired!
 		s2.set('sig_1',n_curr,xin)
-		s2.set('697',n_curr,dft_697[1]/1.5)
-		s2.set('770',n_curr,dft_770[1]/1.5)
+		s2.set('697',n_curr,dft_697[1])
+		s2.set('770',n_curr,dft_770[1])
 		#s2.set('852',n_curr,dft_852[1])
 		#s2.set('941',n_curr,dft_941[1])
 		
-		s2.set('1209',n_curr,dft_1209[1]/1.5)
-		s2.set('1336',n_curr,dft_1336[1]/1.5)
+		s2.set('1209',n_curr,dft_1209[1])
+		s2.set('1336',n_curr,dft_1336[1])
 		#s2.set('1477',n_curr,dft_1477[1])
 		#s2.set('1633',n_curr,dft_1633[1])
 		
@@ -326,46 +316,3 @@ if __name__ == '__main__':
 	
 	main()
 	quit()
-
-
-'''dft_r_list = [dft_697, dft_770, dft_852, dft_941]
-		dft_c_list = [dft_1209, dft_1336, dft_1477, dft_1633]
-		max_r_mag = 0
-		max_c_mag = 0
-		max_r_freq = 0
-		max_c_freq = 0
-		for i in range(4):
-			if dft_r_list[i][1] > max_r_mag:
-				max_r_mag = dft_r_list[i][1]
-				max_r_freq = dft_r_list[i][0]
-    
-			if dft_c_list[i][1] > max_c_mag:
-				max_c_mag = dft_c_list[i][1]
-				max_c_freq = dft_c_list[i][0]
-
-		r_ans = 0
-		c_ans = 0
-
-		if (max_r_freq >= 500 and max_r_freq <= 733):
-			r_ans = 697
-		elif (max_r_freq >= 734 and max_r_freq <= 811):
-			r_ans = 770
-		elif (max_r_freq >= 812 and max_r_freq <= 896):
-			r_ans = 852
-		elif (max_r_freq >= 897 and max_r_freq <= 1050):
-			r_ans = 941
-   
-		if (max_c_freq >= 1109 and max_c_freq <= 1272):
-			c_ans = 1209
-		elif (max_c_freq >= 1273 and max_c_freq <= 1406):
-			c_ans = 1336
-		elif (max_c_freq >= 1407 and max_c_freq <= 1555):
-			c_ans = 1477
-		elif (max_c_freq >= 1556 and max_c_freq <= 1733):
-			c_ans = 1633
-
-		
-		if r_ans not in answers or c_ans not in answers[r_ans]:
-			symbol_val_det = 0
-		else:
-			symbol_val_det = answers[r_ans][c_ans]'''
