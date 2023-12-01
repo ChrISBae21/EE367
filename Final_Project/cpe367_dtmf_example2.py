@@ -43,33 +43,36 @@ def process_wav(fpath_sig_in):
 	########################
 	# FILTER COEFFICIENTS
 	C = 1024
-	N = 64
+	N = 16
  	#ROWS---------------------------------------------------
 
 
    #FILTER 697
-	fifo_y_697 = my_fifo(N)
-	G_697 = 0.018188366000000000949343714751194056589 
-	BK_697 = [G_697 * 1, G_697 * -1,
-				-1 * -0.89974373589061173994707587553421035409,
-				-1 *   0.963628930577864029061174733215011656284]
-    
 	'''fifo_y_697 = my_fifo(N)
+	G_697 = 0.088679323433389133257698233592236647382  
+	#0.079679323433389133257698233592236647382 
+	BK_697 = [G_697 * 1, G_697 * -1,
+				-1 * -0.856524435796195415804277217830531299114,
+				-1 *  0.856641353133221761240179148444440215826]'''
+    
+	fifo_y_697 = my_fifo(N)
 	BK_697 = [0.169290213535903760755374491964175831527 , 0,
 			-1 * -0.826083303834324933490051989792846143246,
-			-1 * 0.809999999999999942268402719491859897971]'''
+			-1 * 0.809999999999999942268402719491859897971]
  
 	fifo_y_770 = my_fifo(N)
-	BK_770 = [0.177777999999999991587174008600413799286  , 0,
+	BK_770 = [0.157777999999999991587174008600413799286  , 0,
 			-1 * -0.6362768971317435129364525892015080899 ,
 			-1 * 0.810000000000000386357612569554476067424 ]
  
-	'''fifo_y_1209 = my_fifo(N)
-	BK_1209 = [0.262709077018945524883974940166808664799, 0,
+ 
+#Need to change 1209 and 1336 to make look like pdf---------------------------------------------------------------------
+	fifo_y_1209 = my_fifo(N)
+	BK_1209 = [0.252709077018945524883974940166808664799, 0,
 				-1 * 0.547983278990897049176567179529229179025,
-				-1 * 0.722500000000000031086244689504383131862]'''
+				-1 * 0.722500000000000031086244689504383131862]
 	fifo_y_1336 = my_fifo(N)
-	BK_1336 = [0.164146336458953157055873361969133839011, 0,
+	BK_1336 = [0.164146336458953157055873361969133839011, 0,		#164146336458953157055873361969133839011
 				-1 * 0.906515709705711492105706383881624788046,
 				-1 * 0.810000000000000275335310107038822025061]
  
@@ -99,12 +102,12 @@ def process_wav(fpath_sig_in):
 	#COLS---------------------------------------------------
 
 
-	#FILTER 1209
+	'''#FILTER 1209
 	fifo_y_1209 = my_fifo(N)
 	G_1209 = 0.018185534711067919549920546273824584205
 	BK_1209 = [G_1209 * 1, G_1209 * -1,
 				-1 * 0.633162787085058131886228238727198913693,
-				-1 * 0.963628930577864140083477195730665698647]
+				-1 * 0.963628930577864140083477195730665698647]'''
 
 	#FILTER 1336
 	'''fifo_y_1336 = my_fifo(N)
@@ -141,17 +144,17 @@ def process_wav(fpath_sig_in):
 		BK_1633[i] = int(round(BK_1633[i] * C))
 
 			# create dictionary of answers
-		answers = {}
-		answers[697] = {1209: 1, 1336: 2, 1477: 3, 1633: 10}
-		answers[770] = {1209: 4, 1336: 5, 1477: 6, 1633: 11}
-		answers[852] = {1209: 7, 1336: 8, 1477: 9, 1633: 12}
-		answers[941] = {1209: 14, 1336: 0, 1477: 15, 1633: 13}
-		answers[1209] = {697: 1, 770: 4, 852: 7, 941: 14}
-		answers[1336] = {697: 2, 770: 5, 852: 8, 941: 0}
-		answers[1477] = {697: 3, 770: 6, 852: 9, 941: 15}
-		answers[1633] = {697: 10, 770: 11, 852: 12, 941: 13}
+	answers = {}
+	answers[697] = {1209: 1, 1336: 2, 1477: 3, 1633: 10}
+	answers[770] = {1209: 4, 1336: 5, 1477: 6, 1633: 11}
+	answers[852] = {1209: 7, 1336: 8, 1477: 9, 1633: 12}
+	answers[941] = {1209: 14, 1336: 0, 1477: 15, 1633: 13}
+	answers[1209] = {697: 1, 770: 4, 852: 7, 941: 14}
+	answers[1336] = {697: 2, 770: 5, 852: 8, 941: 0}
+	answers[1477] = {697: 3, 770: 6, 852: 9, 941: 15}
+	answers[1633] = {697: 10, 770: 11, 852: 12, 941: 13}
  
-	fifo_x = my_fifo(2)
+	fifo_x = my_fifo(N)
 
 	# process input	
 	xin = 0
@@ -189,83 +192,52 @@ def process_wav(fpath_sig_in):
 		########################
 		# students: combine results from filtering stages
 		#  and find (best guess of) symbol that is present at this sample time
-	
-		dft_697 = dft(N, fs, fifo_y_697)
-		dft_770 = dft(N, fs, fifo_y_770)
-		dft_852 = dft(N, fs, fifo_y_852)
-		dft_941 = dft(N, fs, fifo_y_941)
-
-		dft_1209 = dft(N, fs, fifo_y_1209)
-		dft_1336 = dft(N, fs, fifo_y_1336)
-		dft_1477 = dft(N, fs, fifo_y_1477)
-		dft_1633 = dft(N, fs, fifo_y_1633)
-#-------------------------------------------------------------------------  
-
-#-------------------------------------------------------------------------
-  
-		'''dft_r_list = [dft_697, dft_770, dft_852, dft_941]
-		dft_c_list = [dft_1209, dft_1336, dft_1477, dft_1633]
-		max_r_mag = 0
-		max_c_mag = 0
-		max_r_freq = 0
-		max_c_freq = 0
-		for i in range(4):
-			if dft_r_list[i][1] > max_r_mag:
-				max_r_mag = dft_r_list[i][1]
-				max_r_freq = dft_r_list[i][0]
-    
-			if dft_c_list[i][1] > max_c_mag:
-				max_c_mag = dft_c_list[i][1]
-				max_c_freq = dft_c_list[i][0]
-
-		r_ans = 0
-		c_ans = 0
-
-		if (max_r_freq >= 500 and max_r_freq <= 733):
-			r_ans = 697
-		elif (max_r_freq >= 734 and max_r_freq <= 811):
-			r_ans = 770
-		elif (max_r_freq >= 812 and max_r_freq <= 896):
-			r_ans = 852
-		elif (max_r_freq >= 897 and max_r_freq <= 1050):
-			r_ans = 941
-   
-		if (max_c_freq >= 1109 and max_c_freq <= 1272):
-			c_ans = 1209
-		elif (max_c_freq >= 1273 and max_c_freq <= 1406):
-			c_ans = 1336
-		elif (max_c_freq >= 1407 and max_c_freq <= 1555):
-			c_ans = 1477
-		elif (max_c_freq >= 1556 and max_c_freq <= 1733):
-			c_ans = 1633
-
 		
-		if r_ans not in answers or c_ans not in answers[r_ans]:
-			symbol_val_det = 0
-		else:
-			symbol_val_det = answers[r_ans][c_ans]'''
-   
-#-------------------------------------------------------------------------------------------------   
+		if((count % (N//N)) == 0): #16
+			dft_697 = dft(N, fs, fifo_y_697)
+			dft_770 = dft(N, fs, fifo_y_770)
+			dft_852 = dft(N, fs, fifo_y_852)
+			dft_941 = dft(N, fs, fifo_y_941)
 
+			dft_1209 = dft(N, fs, fifo_y_1209)
+			dft_1336 = dft(N, fs, fifo_y_1336)
+			dft_1477 = dft(N, fs, fifo_y_1477)
+			dft_1633 = dft(N, fs, fifo_y_1633)
+  
+		count += 1
+  
+		
 		if (dft_697[1] > dft_770[1] and dft_697[1] > dft_852[1] and dft_697[1] > dft_941[1]):
-			row = 697
+			row = 697 
+			r_mag = dft_697[1]
 		elif (dft_770[1] > dft_852[1] and dft_770[1] > dft_941[1]):
-			row = 770
+			row = 770 
+			r_mag = dft_770[1]
 		elif (dft_852[1] > dft_941[1]):
-			row = 852
+			row = 852 
+			r_mag = dft_852[1]
 		else:
-			row = 941
+			row = 941 
+			r_mag = dft_941[1]
    
 	
 		if (dft_1209[1] > dft_1336[1] and dft_1209[1] > dft_1477[1] and dft_1209[1] > dft_1633[1]):
 			col = 1209
+			c_mag = dft_1209[1]
 		elif (dft_1336[1] > dft_852[1] and dft_1336[1] > dft_1477[1]):
-			col = 1336
+			col = 1336 
+			c_mag = dft_1336[1]
 		elif (dft_1477[1] > dft_1633[1]):
-			col = 1477
+			col = 1477 
+			c_mag = dft_1477[1]
 		else:
-			col = 1633
+			col = 1633 
+			c_mag = dft_1633[1]
 		symbol_val_det =  answers[row][col]
+  
+		if count < 8 or (r_mag <= 20 and c_mag <= 20):
+			symbol_val_det = 0
+		
 
 		# save intermediate signals as needed, for plotting
 		#  add signals, as desired!
@@ -301,7 +273,7 @@ def process_wav(fpath_sig_in):
 		
 	# define which signals should be plotted
 	#plot_sig_list = ['sig_1','sig_2','symbol_val','symbol_det','error']
-	plot_sig_list = ['sig_1','error', 'symbol_val','symbol_det', 
+	plot_sig_list = ['symbol_val','symbol_det','error', 
                   	 '697','770',
                      '1209','1336']
 	'''plot_sig_list = ['sig_1','symbol_val','symbol_det', 
@@ -376,7 +348,7 @@ def main():
 		
 	# assign file name
 	fpath_sig_in = 'dtmf_signals_slow.txt'
-	#fpath_sig_in = 'dtmf_signals_fast.txt'
+	fpath_sig_in = 'dtmf_signals_fast.txt'
 	
 	
 	# let's do it!
@@ -392,3 +364,46 @@ if __name__ == '__main__':
 	
 	main()
 	quit()
+
+
+'''dft_r_list = [dft_697, dft_770, dft_852, dft_941]
+		dft_c_list = [dft_1209, dft_1336, dft_1477, dft_1633]
+		max_r_mag = 0
+		max_c_mag = 0
+		max_r_freq = 0
+		max_c_freq = 0
+		for i in range(4):
+			if dft_r_list[i][1] > max_r_mag:
+				max_r_mag = dft_r_list[i][1]
+				max_r_freq = dft_r_list[i][0]
+    
+			if dft_c_list[i][1] > max_c_mag:
+				max_c_mag = dft_c_list[i][1]
+				max_c_freq = dft_c_list[i][0]
+
+		r_ans = 0
+		c_ans = 0
+
+		if (max_r_freq >= 500 and max_r_freq <= 733):
+			r_ans = 697
+		elif (max_r_freq >= 734 and max_r_freq <= 811):
+			r_ans = 770
+		elif (max_r_freq >= 812 and max_r_freq <= 896):
+			r_ans = 852
+		elif (max_r_freq >= 897 and max_r_freq <= 1050):
+			r_ans = 941
+   
+		if (max_c_freq >= 1109 and max_c_freq <= 1272):
+			c_ans = 1209
+		elif (max_c_freq >= 1273 and max_c_freq <= 1406):
+			c_ans = 1336
+		elif (max_c_freq >= 1407 and max_c_freq <= 1555):
+			c_ans = 1477
+		elif (max_c_freq >= 1556 and max_c_freq <= 1733):
+			c_ans = 1633
+
+		
+		if r_ans not in answers or c_ans not in answers[r_ans]:
+			symbol_val_det = 0
+		else:
+			symbol_val_det = answers[r_ans][c_ans]'''
